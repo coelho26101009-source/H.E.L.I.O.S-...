@@ -139,7 +139,7 @@ const App: React.FC = () => {
     );
   }
 
-  if (authMode === 'loading' || (authMode !== 'user' && authMode !== 'guest')) {
+  if (authMode !== 'user' && authMode !== 'guest') {
     return <LoginScreen onLogin={login} onGuest={continueAsGuest} />;
   }
 
