@@ -72,22 +72,12 @@ export const useChat = (user: User | null, onReply: (text: string) => void) => {
     setIsLoading(true);
 
     try {
-      // Construir histórico para a API
-      const apiMessages: any[] = [
-        {
-          role: 'system',
-          content: `Tu és o H.E.L.I.O.S. (Hyper-Evolved Logic & Intelligence Operating System), uma Inteligência Artificial avançada e elegante criada pelo Simão. Estás a falar com ${userName}. Responde sempre em Português de Portugal (PT-PT), com um tom profissional mas acessível. Quando apresentares código, usa blocos de código com a linguagem indicada.`,
-        },
-      ];
+      // Construir a mensagem para a API
+      let apiMessages: any[] = [];
 
-      // Histórico anterior (apenas texto)
-      logs.forEach(l => {
-        if (l.source === 'USER') apiMessages.push({ role: 'user', content: l.text });
-        if (l.source === 'HELIOS') apiMessages.push({ role: 'assistant', content: l.text });
-      });
-
-      // Nova mensagem
       if (attachment) {
+        // 🚨 A CURA DO ERRO 400: O motor de visão do Groq é picuinhas! 
+        // Ele não aceita o histórico nem o "System Prompt" junto com imagens. Tem de ir isolado.
         apiMessages.push({
           role: 'user',
           content: [
@@ -96,6 +86,19 @@ export const useChat = (user: User | null, onReply: (text: string) => void) => {
           ],
         });
       } else {
+        // MODO TEXTO NORMAL: Leva a personalidade do H.E.L.I.O.S. e a memória toda!
+        apiMessages.push({
+          role: 'system',
+          content: `Tu és o H.E.L.I.O.S. (Hyper-Evolved Logic & Intelligence Operating System), uma Inteligência Artificial avançada e elegante criada pelo Simão. Estás a falar com ${userName}. Responde sempre em Português de Portugal (PT-PT), com um tom profissional mas acessível. Quando apresentares código, usa blocos de código com a linguagem indicada.`,
+        });
+
+        // Histórico anterior (apenas texto)
+        logs.forEach(l => {
+          if (l.source === 'USER') apiMessages.push({ role: 'user', content: l.text });
+          if (l.source === 'HELIOS') apiMessages.push({ role: 'assistant', content: l.text });
+        });
+
+        // Nova mensagem de texto
         apiMessages.push({ role: 'user', content: text });
       }
 
@@ -109,6 +112,7 @@ export const useChat = (user: User | null, onReply: (text: string) => void) => {
           model: attachment ? VISION_MODEL : TEXT_MODEL,
           messages: apiMessages,
           temperature: 0.7,
+          max_tokens: attachment ? 1024 : undefined // Adicionado por segurança: a visão exige um limite de tokens
         }),
       });
 
