@@ -8,7 +8,7 @@ import { db } from '../firebase';
 import { LogMessage, Chat, Attachment } from '../types';
 
 const TEXT_MODEL = 'llama-3.3-70b-versatile';
-const VISION_MODEL = 'llama-3.2-11b-vision-instruct';
+const VISION_MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct';
 const GROQ_API_KEY = (import.meta as any).env.VITE_GROQ_API_KEY;
 
 export const useChat = (user: User | null, onReply: (text: string) => void) => {
